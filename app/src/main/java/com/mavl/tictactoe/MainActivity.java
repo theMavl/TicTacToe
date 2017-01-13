@@ -14,20 +14,20 @@ public class MainActivity extends AppCompatActivity {
 
     byte[][] field = new byte[3][3];
     TextView[][] drField = new TextView[3][3];
+    TextView tvStatus;
     byte player;
     int tmp;
     boolean win = false;
     byte clicks = 0;
     String[] labels = {"", "X", "O"};
-    Intent in = getIntent();
     byte gMode;
-    gMode = in.
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+        Intent in = getIntent();
+        gMode = in.getByteExtra("mode", (byte)-1);
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++) {
                 Log.d("getting",("f"+i+j));
@@ -35,7 +35,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("got",tmp+"");
                 drField[i][j] = (TextView) findViewById(tmp);
             }
+        tvStatus = (TextView)findViewById(R.id.tvStatus);
         player = 1;
+        refreshStatus(player);
         clearField();
         Log.d("onCreate", "i'm done");
     }
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         if ((win) || clicks >= 9) {
             win = false;
             clearField();
+            refreshStatus(player);
             return;
         }
         tmp = view.getId();
@@ -56,20 +59,24 @@ public class MainActivity extends AppCompatActivity {
                         field[i][j] = player;
                         clicks ++;
                         drField[i][j].setText(labels[player]);
-                        if (checkWin(player,i,j)){
-                            Toast.makeText(this, "Игрок "+player+" выиграл!", Toast.LENGTH_LONG).show();
+                        if (checkWin(player,i,j,false)){
+                            if (gMode == 1)
+                                tvStatus.setText("Игрок "+player+" выиграл!");
+                            else
+                                tvStatus.setText("Вы выиграли!");
                             win = true;
                             return;
                         }
                         if (clicks == 9) {
-                            Toast.makeText(this, "Ничья", Toast.LENGTH_LONG).show();
+                            tvStatus.setText("Ничья");
                             return;
                         }
-                        if (mode == 1) {
+                        if (gMode == 1) {
                             if (player == 1)
                                 player = 2;
                             else
                                 player = 1;
+                            refreshStatus(player);
                         }
                         else {
                             aiMove();
@@ -101,19 +108,24 @@ public class MainActivity extends AppCompatActivity {
         bump: {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
-                    COMPwins = checkWin(COMP,i,j);
-                    USERwins = checkWin(USER,i,j);
+                    if (field[i][j] > 0)
+                        continue;
+                    COMPwins = checkWin(COMP,i,j,true);
+                    //Log.d("AI", String.format("Let's check if COMP wins at %d %d - %s", i,j, ((COMPwins)? "YES" : "NO")));
+                    USERwins = checkWin(USER,i,j,true);
+                    //Log.d("AI", String.format("Let's check if USER wins at %d %d - %s", i,j, ((USERwins)? "YES" : "NO")));
                     if (((act == 0) || (act == 2)) && (COMPwins)) {
                         act = 1;
                         assum[0] = i;
                         assum[1] = j;
+                        Log.d("AI", String.format("I found win position at %d %d", i,j));
                         break bump;
                     }
-                    else if ((act == 0) && (USERwins)) {
+                    if ((act == 0) && (USERwins)) {
                         act = 2;
                         assum[0] = i;
                         assum[1] = j;
-                        break bump;
+                        Log.d("AI", String.format("I found interruption position at %d %d", i,j));
                     }
                 }
             }
@@ -123,18 +135,23 @@ public class MainActivity extends AppCompatActivity {
             do {
                 assum[0] = (int)(Math.random()*3);
                 assum[1] = (int)(Math.random()*3);
-            } while (field[assum[0]][assum[1]] == 1);
+            } while (field[assum[0]][assum[1]] != 0);
+            Log.d("AI", String.format("I found nothing, let's just set rand position %d %d", assum[0],assum[1]));
             clicks++;
             drField[assum[0]][assum[1]].setText(labels[COMP]);
+            field[assum[0]][assum[1]] = COMP;
             return;
         }
         if (act == 1) {
+            field[assum[0]][assum[1]] = COMP;
             drField[assum[0]][assum[1]].setText(labels[COMP]);
             win = true;
-            Toast.makeText(this, "Компуктер выиграл!", Toast.LENGTH_LONG).show();
+            checkWin(COMP, assum[0],assum[1], false);
+            tvStatus.setText("ИИ выиграл!");
             return;
         }
         if (act == 2) {
+            field[assum[0]][assum[1]] = COMP;
             drField[assum[0]][assum[1]].setText(labels[COMP]);
             clicks++;
             return;
@@ -143,36 +160,57 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    boolean checkWin (byte i, int x, int y) {
-            if ((field[x][0] == i) && (field[x][1] == i) && (field[x][2] == i)) {
-                drField[x][0].setTextColor(Color.RED);
-                drField[x][1].setTextColor(Color.RED);
-                drField[x][2].setTextColor(Color.RED);
+    boolean checkWin (byte i, int x, int y, boolean assume) {
+        //Log.d("checkWin", String.format("Checking if player %d wins at %d %d", i, x, y));
+            if (((field[x][0] == i) || ((y == 0) && assume)) && ((field[x][1] == i) || ((y == 1) && assume)) && ((field[x][2] == i) || ((y == 2) && assume))) {
+                if (!(assume)) {
+                    setRed(x,0, x,1, x,2);
+                }
+                //Log.d("checkWin", "Player wins at horiz");
                 return true;
             }
 
-            if ((field[0][y] == i) && (field[1][y] == i) && (field[2][y] == i)) {
-                drField[0][y].setTextColor(Color.RED);
-                drField[1][y].setTextColor(Color.RED);
-                drField[2][y].setTextColor(Color.RED);
+            if (((field[0][y] == i || ((x == 0) && assume))) && ((field[1][y] == i) || ((x == 1) && assume)) && ((field[2][y] == i) || ((x == 2) && assume))) {
+                if (!(assume)) {
+                    setRed(0,y, 1,y, 2,y);
+                }
+                //Log.d("checkWin", "Player wins at vert");
                 return true;
             }
 
-            if ((field[0][0] == i) && (field[1][1] == i) && (field[2][2] == i)) {
-                drField[0][0].setTextColor(Color.RED);
-                drField[1][1].setTextColor(Color.RED);
-                drField[2][2].setTextColor(Color.RED);
+            if (((field[0][0] == i || ((x == 0) && (y == 0) && assume))) && ((field[1][1] == i || ((x == 1) && (y == 1) && assume))) && ((field[2][2] == i) || ((x == 2) && (y == 2) && assume))) {
+                if (!(assume)) {
+                    setRed(0,0, 1,1, 2,2);
+                }
+                //Log.d("checkWin", "Player wins at right diag");
                 return true;
             }
 
-            if ((field[0][2] == i) && (field[1][1] == i) && (field[2][0] == i)) {
-                drField[0][2].setTextColor(Color.RED);
-                drField[1][1].setTextColor(Color.RED);
-                drField[2][0].setTextColor(Color.RED);
+            if (((field[0][2] == i || ((x == 0) && (y == 2) && assume))) && ((field[1][1] == i || ((x == 1) && (y == 1) && assume))) && ((field[2][0] == i) || ((x == 2) && (y == 0) && assume))) {
+                if (!(assume)) {
+                    setRed(0,2, 1,1, 2,0);
+                }
+                //Log.d("checkWin", "Player wins at left diag");
                 return true;
             }
-
+        //Log.d("checkWin", "Nope, he won't");
         return false;
+    }
+
+    void setRed (int x1, int y1, int x2, int y2, int x3, int y3) {
+        drField[x1][y1].setTextColor(Color.RED);
+        drField[x2][y2].setTextColor(Color.RED);
+        drField[x3][y3].setTextColor(Color.RED);
+    }
+
+    void refreshStatus(byte i) {
+        if (i == 1)
+            if (gMode == 2)
+                tvStatus.setText("Ваша очередь делать ход");
+            else
+                tvStatus.setText("Игрок 1 делает ход");
+        else
+            tvStatus.setText("Игрок 2 делает ход");
     }
 
 
