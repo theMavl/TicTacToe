@@ -16,12 +16,6 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-        <Button
-            android:text="Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button" />
-
         <TextView
             android:text="Крестики-нолики"
             android:layout_width="match_parent"
@@ -31,7 +25,17 @@
             android:textAlignment="center"
             android:textColor="@android:color/black"
             android:gravity="center_vertical|center_horizontal"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:onClick="onClick"/>
+
+        <TextView
+            android:text="TextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/tvStatus"
+            android:gravity="bottom|center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
     </FrameLayout>
 
     <LinearLayout
@@ -51,7 +55,8 @@
             android:textColor="@android:color/background_dark"
             android:textAlignment="center"
             android:gravity="center_vertical|center_horizontal"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:onClick="onClick"/>
 
         <TextView
             android:text="X"
@@ -64,7 +69,8 @@
             android:textColor="@android:color/background_dark"
             android:textAlignment="center"
             android:gravity="center_vertical|center_horizontal"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:onClick="onClick"/>
 
         <TextView
             android:text="X"
@@ -77,7 +83,8 @@
             android:textColor="@android:color/background_dark"
             android:textAlignment="center"
             android:gravity="center_vertical|center_horizontal"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:onClick="onClick"/>
     </LinearLayout>
 
     <LinearLayout
@@ -97,7 +104,8 @@
             android:textColor="@android:color/background_dark"
             android:textAlignment="center"
             android:gravity="center_vertical|center_horizontal"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:onClick="onClick"/>
 
         <TextView
             android:text="X"
@@ -110,7 +118,8 @@
             android:textColor="@android:color/background_dark"
             android:textAlignment="center"
             android:gravity="center_vertical|center_horizontal"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:onClick="onClick"/>
 
         <TextView
             android:text="X"
@@ -123,7 +132,8 @@
             android:textColor="@android:color/background_dark"
             android:textAlignment="center"
             android:gravity="center_vertical|center_horizontal"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:onClick="onClick"/>
     </LinearLayout>
 
     <LinearLayout
@@ -143,7 +153,8 @@
             android:textColor="@android:color/background_dark"
             android:textAlignment="center"
             android:gravity="center_vertical|center_horizontal"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:onClick="onClick"/>
 
         <TextView
             android:text="X"
@@ -156,7 +167,8 @@
             android:textColor="@android:color/background_dark"
             android:textAlignment="center"
             android:gravity="center_vertical|center_horizontal"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:onClick="onClick"/>
 
         <TextView
             android:text="X"
@@ -169,6 +181,7 @@
             android:textColor="@android:color/background_dark"
             android:textAlignment="center"
             android:gravity="center_vertical|center_horizontal"
-            android:clickable="true"/>
+            android:clickable="true"
+            android:onClick="onClick"/>
     </LinearLayout>
 </LinearLayout>
